@@ -1,0 +1,43 @@
+var http=require('http');
+var url=require('url');
+var server=http.createServer(function(req,res){
+  var reqObj=url.parse(req.url,true),
+  pathname=reqObj.pathname,
+  strtime=reqObj.query.iso,
+  result;
+
+  if(pathname==='/api/unixtime'){
+    result=getUnixTimestamp(strtime);
+  }
+  else if(pathname==='/api/parsetime'){
+    result=getTimeObj(strtime);
+  }
+  if(result){
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify(result));
+  }
+  else{
+    res.writeHead(404);
+    res.end();
+  }
+});
+server.listen(Number(process.argv[2]));
+function getUnixTimestamp(strtime) {
+  return {
+    unixtime: getTimestamp(strtime)
+  };
+}
+
+function getTimestamp(strtime) {
+  return Date.parse(strtime);
+}
+
+function getTimeObj(strtime) {
+  var date = new Date(getTimestamp(strtime));
+
+  return {
+    hour: date.getHours(),
+    minute: date.getMinutes(),
+    second: date.getSeconds()
+  };
+}
